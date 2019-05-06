@@ -4,7 +4,7 @@ import random
 import re
 import csv
 
-EXAMPLE_LENGTH = 50
+EXAMPLE_LENGTH = 100
 
 
 
