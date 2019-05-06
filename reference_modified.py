@@ -12,7 +12,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Hyper-parameters
 # sequence_length = 28
-sequence_length = 50
+sequence_length = 100
 input_size = 50
 # input_size = 28
 hidden_size = 128
@@ -23,11 +23,11 @@ num_epochs = 2
 learning_rate = 0.003
 
 
-train_images, train_labels = generate_minibatch.export_main(50, 100)
+train_images, train_labels = generate_minibatch.export_main(input_size, batch_size)
 train_images = torch.from_numpy(train_images)
 train_labels = torch.from_numpy(train_labels)
 
-test_images, test_labels = generate_minibatch.export_main(50, 100)
+test_images, test_labels = generate_minibatch.export_main(input_size, batch_size)
 test_images = torch.from_numpy(test_images)
 test_labels = torch.from_numpy(test_labels)
 
