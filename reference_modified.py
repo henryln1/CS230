@@ -18,7 +18,7 @@ input_size = 50
 hidden_size = 128
 num_layers = 2
 num_classes = 10
-batch_size = 100
+batch_size = 1000
 num_epochs = 2
 learning_rate = 0.003
 
@@ -58,7 +58,8 @@ class BiRNN(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
-        self.fc = nn.Linear(hidden_size*2, num_classes)  # 2 for bidirection
+        # self.fc = nn.Linear(hidden_size*2, num_classes)  # 2 for bidirection
+        self.fc = nn.Linear(hidden_size*2, 1)  # 2 for bidirection
     
     def forward(self, x):
         # Set initial states
@@ -76,7 +77,9 @@ model = BiRNN(input_size, hidden_size, num_layers, num_classes).to(device)
 
 
 # Loss and optimizer
-criterion = nn.CrossEntropyLoss()
+# criterion = nn.CrossEntropyLoss()
+criterion = nn.MSELoss()
+# Use mean squared error
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     
 # Train the model
@@ -85,10 +88,11 @@ for epoch in range(num_epochs):
     for i in range(len(train_images)):
     # for i, (images, labels) in enumerate(train_loader):
         images = train_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
-        labels = train_labels[i].type('torch.LongTensor').to(device)
+        labels = train_labels[i].type('torch.FloatTensor').to(device)
           
         # Forward pass
         outputs = model(images)
+        # loss = criterion(outputs, labels)
         loss = criterion(outputs, labels)
         
         # Backward and optimize
@@ -113,7 +117,7 @@ with torch.no_grad():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-    print('Test Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total)) 
+    print('Test Accuracy of the model on the 100 test examples: {} %'.format(100 * correct / total)) 
 
 # Save the model checkpoint
 torch.save(model.state_dict(), 'model.ckpt')
