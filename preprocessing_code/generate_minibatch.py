@@ -24,17 +24,14 @@ def build_minibatch(minibatch_size, glove_vectors, data_file_location):
 	print(data_points[0])
 	for i in range(len(data_points)):
 		_, subreddit, title, score, num_comments, timestamp = tuple(data_points[i])
-		print("Title: ", title)
 		title_words_list = re.sub(r'[^a-zA-Z ]', '', title).split()
 		title_words_list = [x.lower() for x in title_words_list]
-		print("Words: ", title_words_list)
 		for j in range(len(title_words_list)):
 			curr_word = title_words_list[j]
 			if curr_word in glove_vectors:
 				X[i][j] = glove_vectors[curr_word]
-		print("X: ", X[i])
+		print("Title Length: ", len(title_words_list))
 		Y[i] = score
-		print("Y: ", Y[i])
 	return X, Y
 
 
