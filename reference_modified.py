@@ -6,6 +6,7 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 import generate_minibatch
+import time
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -18,18 +19,19 @@ input_size = 50
 hidden_size = 128
 num_layers = 2
 num_classes = 10
-batch_size = 1000
-num_epochs = 2
-learning_rate = 0.003
+batch_size = 4096
+num_epochs = 4
+learning_rate = 0.0001
+dev_batch_size = 1024
 
 
-train_images, train_labels = generate_minibatch.export_main(input_size, batch_size)
+train_images, train_labels = generate_minibatch.export_main(input_size, batch_size, 'train')
 train_images = torch.from_numpy(train_images)
 train_labels = torch.from_numpy(train_labels)
 
-test_images, test_labels = generate_minibatch.export_main(input_size, batch_size)
-test_images = torch.from_numpy(test_images)
-test_labels = torch.from_numpy(test_labels)
+dev_images, dev_labels = generate_minibatch.export_main(input_size, dev_batch_size, 'dev')
+dev_images = torch.from_numpy(dev_images)
+dev_labels = torch.from_numpy(dev_labels)
 
 
 # MNIST dataset
@@ -73,8 +75,12 @@ class BiRNN(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 
-model = BiRNN(input_size, hidden_size, num_layers, num_classes).to(device)
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+model = BiRNN(input_size, hidden_size, num_layers, num_classes).to(device)
+number_params = count_parameters(model)
+print("Number of trainable Parameters: ", number_params)
 
 # Loss and optimizer
 # criterion = nn.CrossEntropyLoss()
@@ -85,6 +91,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 # Train the model
 total_step = len(train_labels)
 for epoch in range(num_epochs):
+    start_time = time.time()
     for i in range(len(train_images)):
     # for i, (images, labels) in enumerate(train_loader):
         images = train_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
@@ -103,21 +110,23 @@ for epoch in range(num_epochs):
         if (i+1) % 100 == 0:
             print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+    time_elapsed = time.time() - start_time
+    print("Epoch: " , str(epoch + 1), " took ", str(time_elapsed), " seconds.")
 
 # Test the model
 with torch.no_grad():
     correct = 0
     total = 0
-    for i in range(len(test_labels)):
+    for i in range(len(dev_labels)):
     # for images, labels in test_loader:
-        images = test_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
-        labels = test_labels[i].type('torch.LongTensor').to(device)
+        images = dev_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
+        labels = dev_labels[i].type('torch.LongTensor').to(device)
         outputs = model(images)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-    print('Test Accuracy of the model on the 100 test examples: {} %'.format(100 * correct / total)) 
+    print('Dev Accuracy of the model on the 1024 dev examples: {} %'.format(100 * correct / total)) 
 
 # Save the model checkpoint
 torch.save(model.state_dict(), 'model.ckpt')
