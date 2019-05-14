@@ -46,7 +46,6 @@ def build_minibatch(minibatch_size, glove_vectors, data_file_location):
 	with open(data_file_location, encoding="utf8") as fd:
 		reader = csv.reader(fd)
 		data_points = [row for idx, row in enumerate(reader) if idx in random_rows]
-	print(data_points[0])
 	for i in range(len(data_points)):
 		_, subreddit, title, score, num_comments, timestamp = tuple(data_points[i])
 		title_words_list = re.sub(r'[^a-zA-Z ]', '', title).split()
@@ -55,7 +54,6 @@ def build_minibatch(minibatch_size, glove_vectors, data_file_location):
 			curr_word = title_words_list[j]
 			if curr_word in glove_vectors:
 				X[i][j] = glove_vectors[curr_word]
-		print("Title Length: ", len(title_words_list))
 		Y[i] = score
 	return X, Y
 
@@ -75,11 +73,16 @@ def build_glove_dict(file_name):
 	f.close()
 	return glove_dict
 
-def export_main(glove_dims, mb_size):
+def export_main(glove_dims, mb_size, split):
 	# assert len(sys.argv) == 3 #make sure we are given a glove vector dim and minibatch size
 	glove_vector_dimensions = glove_dims
 	minibatch_size = mb_size
-	data_file_location = './preprocessing_code/RS_2018-09_AskReddit_submissions.csv'
+	if split == 'train':
+		data_file_location = 'train_data.csv'
+	elif split == 'dev':
+		data_file_location = 'dev_data.csv'
+	elif split == 'test':
+		data_file_location = 'test_data.csv'
 	glove_vector_location = './preprocessing_code/glove.6B/glove.6B.' + str(glove_vector_dimensions) + 'd.txt'
 	glove_vectors_dict = build_glove_dict(glove_vector_location)
 	X, Y = build_minibatch(minibatch_size, glove_vectors_dict, data_file_location)
@@ -89,7 +92,7 @@ def main():
 	assert len(sys.argv) == 3 #make sure we are given a glove vector dim and minibatch size
 	glove_vector_dimensions = sys.argv[1]
 	minibatch_size = int(sys.argv[2])
-	data_file_location = './preprocessing_code/RS_2018-09_AskReddit_submissions.csv'
+	data_file_location = './preprocessing_code/RS_2018-09_AskReddit_submissions_commas_removed.csv'
 	glove_vector_location = './preprocessing_code/glove.6B/glove.6B.' + str(glove_vector_dimensions) + 'd.txt'
 	glove_vectors_dict = build_glove_dict(glove_vector_location)
 	X, Y = build_minibatch(minibatch_size, glove_vectors_dict, data_file_location)
