@@ -6,6 +6,9 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 import generate_minibatch
+import csv
+import numpy as np
+import re
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -22,12 +25,63 @@ batch_size = 1000
 num_epochs = 2
 learning_rate = 0.003
 
+EXAMPLE_LENGTH = 100
 
-train_images, train_labels = generate_minibatch.export_main(input_size, batch_size)
+glove_vectors = generate_minibatch.export_glove(input_size)
+glove_vector_dim = len(glove_vectors['the'])
+
+# Read in train data
+train_images = None
+train_labels = None
+num_train_examples = 0
+with open('train_data.csv', encoding="utf8") as file:
+  reader = csv.reader(file, delimiter=',')
+  num_train_examples = sum(1 for row in reader)
+
+with open('train_data.csv', encoding="utf8") as file:
+  reader = csv.reader(file, delimiter=',')
+  train_images = np.zeros(shape = (num_train_examples - 1, EXAMPLE_LENGTH, glove_vector_dim))
+  train_labels = np.zeros(shape = (num_train_examples - 1, 1))
+  for idx, example in enumerate(reader):
+    if idx == 0:
+      continue
+    _, subreddit, title, score, num_comments, timestamp = tuple(example)  
+    title_words_list = re.sub(r'[^a-zA-Z ]', '', title).split()
+    title_words_list = [x.lower() for x in title_words_list]
+    for j in range(len(title_words_list)):
+      curr_word = title_words_list[j]
+      if curr_word in glove_vectors:
+        train_images[idx-1][j] = glove_vectors[curr_word]
+        train_labels[idx-1] = float(score)
+
+# Read in dev/test data
+test_images = None
+test_labels = None
+with open('dev_data.csv', encoding="utf8") as file:
+  reader = csv.reader(file, delimiter=',')
+  num_test_examples = sum(1 for row in reader)
+
+with open('dev_data.csv', encoding="utf8") as file:
+  reader = csv.reader(file, delimiter=',')
+  test_images = np.zeros(shape = (num_test_examples - 1, EXAMPLE_LENGTH, glove_vector_dim))
+  test_labels = np.zeros(shape = (num_test_examples - 1, 1))
+  for idx, example in enumerate(reader):
+    if idx == 0:
+      continue
+    _, subreddit, title, score, num_comments, timestamp = tuple(example)  
+    title_words_list = re.sub(r'[^a-zA-Z ]', '', title).split()
+    title_words_list = [x.lower() for x in title_words_list]
+    for j in range(len(title_words_list)):
+      curr_word = title_words_list[j]
+      if curr_word in glove_vectors:
+        test_images[idx-1][j] = glove_vectors[curr_word]
+        test_labels[idx-1] = float(score)
+
+# train_images, train_labels = generate_minibatch.export_main(input_size, batch_size)
 train_images = torch.from_numpy(train_images)
 train_labels = torch.from_numpy(train_labels)
 
-test_images, test_labels = generate_minibatch.export_main(input_size, batch_size)
+# test_images, test_labels = generate_minibatch.export_main(input_size, batch_size)
 test_images = torch.from_numpy(test_images)
 test_labels = torch.from_numpy(test_labels)
 
