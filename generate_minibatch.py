@@ -73,7 +73,21 @@ def build_glove_dict(file_name):
 	f.close()
 	return glove_dict
 
+<<<<<<< HEAD
 def export_main(glove_dims, mb_size, split):
+=======
+def export_glove(glove_dims):
+	glove_vector_dimensions = glove_dims
+	# minibatch_size = mb_size
+	data_file_location = './preprocessing_code/RS_2018-09_AskReddit_submissions.csv'
+	glove_vector_location = './preprocessing_code/glove.6B/glove.6B.' + str(glove_vector_dimensions) + 'd.txt'
+	glove_vectors_dict = build_glove_dict(glove_vector_location)
+	# X, Y = build_minibatch(minibatch_size, glove_vectors_dict, data_file_location)
+	# return X, Y
+	return glove_vectors_dict	
+
+def export_main(glove_dims, mb_size):
+>>>>>>> 813298599663811342f43782bdd11c988e8db668
 	# assert len(sys.argv) == 3 #make sure we are given a glove vector dim and minibatch size
 	glove_vector_dimensions = glove_dims
 	minibatch_size = mb_size
