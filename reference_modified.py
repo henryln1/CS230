@@ -13,6 +13,8 @@ import re
 import random
 from sklearn.metrics import mean_squared_error
 
+import torch.nn.functional as F
+
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -23,10 +25,9 @@ input_size = 50
 # input_size = 28
 hidden_size = 128
 num_layers = 2
-num_classes = 10
 batch_size = 512
-num_epochs = 4
-learning_rate = 0.0001
+num_epochs = 1
+learning_rate = 0.001
 dev_batch_size = 512
 
 EXAMPLE_LENGTH = 100
@@ -113,13 +114,12 @@ dev_labels = torch.from_numpy(dev_labels)
 
 # Bidirectional recurrent neural network (many-to-one)
 class BiRNN(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers, num_classes):
+    def __init__(self, input_size, hidden_size, num_layers):
         super(BiRNN, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
-        # self.fc = nn.Linear(hidden_size*2, num_classes)  # 2 for bidirection
-        self.fc = nn.Linear(hidden_size*2, 1)  # 2 for bidirection
+        self.fc = nn.Linear(hidden_size * 2, 1)  # 2 for bidirection
     
     def forward(self, x):
         # Set initial states
@@ -128,20 +128,20 @@ class BiRNN(nn.Module):
         
         # Forward propagate LSTM
         out, _ = self.lstm(x, (h0, c0))  # out: tensor of shape (batch_size, seq_length, hidden_size*2)
-        
+        print("POST LSTM: ", out)
         # Decode the hidden state of the last time step
-        out = self.fc(out[:, -1, :])
+        # out = self.fc(out[:, -1, :])
+        # print("POST FC: ", out)
         return out
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-model = BiRNN(input_size, hidden_size, num_layers, num_classes).to(device)
+model = BiRNN(input_size, hidden_size, num_layers).to(device)
 number_params = count_parameters(model)
 print("Number of trainable parameters: ", number_params)
 
 # Loss and optimizer
-# criterion = nn.CrossEntropyLoss()
 criterion = nn.MSELoss()
 # Use mean squared error
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -159,18 +159,59 @@ train_f = open(train_error_history, "a+")
 dev_f = open(dev_error_history, "a+")
 
 # Train the model
-total_step = len(train_labels)
+total_step = 10
+num_epochs = 10
+iterations = []
+loss_history = []
+
+
+
+# with torch.no_grad():
+#     correct = 0
+#     total = 0
+#     predicted_list = []
+#     actual_label_list = []
+#     for i in range(total_step, total_step * 2):
+#     # for images, labels in test_loader:
+#         images = train_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
+#         labels = train_labels[i].type('torch.FloatTensor').to(device)
+#         outputs = model(images)
+#         print("Output: ", outputs)
+#         print("Output shape: ", outputs.size())
+#         predicted = outputs[0, 0, 0]
+#         print("predicted last thing: ", predicted)
+#         # print("predicted last thing shape: ", predicted.size())
+#         # predicted = outputs.item()
+#         total += labels.size(0)
+#         correct += (predicted == labels).sum().item()
+#         actual_label_list.append(train_labels[i].item())
+#         predicted_list.append(predicted.item())
+#     print('Train Accuracy of the model on the full train set: {} %'.format(100 * correct / total)) 
+#     print('Mean Squared Error: ', mean_squared_error(predicted_list, actual_label_list))
+    
+# print("Predicted: ", predicted_list)
+# print("Actual: ", actual_label_list)
+# exit()
+
+
 for epoch in range(num_epochs):
     start_time = time.time()
-    for i in range(len(train_images)):
+    for i in range(total_step):
     # for i in range(100): #training on small set
     # for i, (images, labels) in enumerate(train_loader):
+        print("Train Shape pre reshape: ", train_images[i].size())
         images = train_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
+        print("Input Shape: ", images.size())
         labels = train_labels[i].type('torch.FloatTensor').to(device)
           
         # Forward pass
         outputs = model(images)
-        # loss = criterion(outputs, labels)
+        outputs = outputs[0, 0 , 0]
+        # print("Output: ", outputs)
+        # outputs = outputs.reshape(1)
+        print("Training Actual Label: ", train_labels[i].item())
+        print("Predicted Label: ", outputs)
+
         loss = criterion(outputs, labels)
         
         # Backward and optimize
@@ -178,7 +219,7 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         
-        if (i+1) % 100 == 0:
+        if (i+1) % 10 == 0:
             print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
             # checks weights are updating part 2
@@ -187,8 +228,10 @@ for epoch in range(num_epochs):
             #     new_state_dict[key] = model.state_dict()[key].clone()
             # for key in old_state_dict:
             #     if not (old_state_dict[key] == new_state_dict[key]).all():
-            #         print('Diff in {}'.format(key)
-
+            #         print('Diff in {}'.format(key))
+            #         print('Diff is: ', new_state_dict[key], ", ", old_state_dict[key])
+            iterations.append(epoch * total_step + i)
+            loss_history.append(loss.item())
         if (i+1) % 1000 == 0:
             print('Evaluating on last 500 examples from training set.')
             with torch.no_grad():
@@ -197,13 +240,13 @@ for epoch in range(num_epochs):
                 predicted_list = []
                 actual_label_list = []
                 for j in range(i, i - 500, -1):
-                    images = dev_images[j].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
-                    labels = dev_labels[j].type('torch.FloatTensor').to(device)
+                    images = train_images[j].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
+                    labels = train_labels[j].type('torch.FloatTensor').to(device)
                     outputs = model(images)
                     predicted, _ = torch.max(outputs.data, 1)
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
-                    actual_label_list.append(dev_labels[j])
+                    actual_label_list.append(train_labels[j].item())
                     predicted_list.append(predicted.item())
                 print('Train Accuracy of the model on the 500 training examples: {} %'.format(100 * correct / total))               
                 print('Mean Squared Error: ', mean_squared_error(predicted_list, actual_label_list))
@@ -225,9 +268,9 @@ for epoch in range(num_epochs):
                     predicted, _ = torch.max(outputs.data, 1)
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
-                    actual_label_list.append(dev_labels[j])
+                    actual_label_list.append(dev_labels[j].item())
                     predicted_list.append(predicted.item())
-                print('Dev Accuracy of the model on the 500 dev examples: {} %'.format(100 * correct / total)) 
+                print('Train Accuracy of the model on the 500 dev examples: {} %'.format(100 * correct / total)) 
                 print('Mean Squared Error: ', mean_squared_error(predicted_list, actual_label_list))
                 dev_f.write("Predicted: " + str(predicted_list) + '\n')
                 dev_f.write("Actual: " + str(actual_label_list) + '\n')
@@ -237,51 +280,53 @@ for epoch in range(num_epochs):
     print("Epoch: " , str(epoch + 1), " took ", str(time_elapsed), " seconds.")
 
 
-dev_output_file = 'dev_model_outputs_1.txt'
-train_output_file = 'train_model_outputs_1.txt'
+dev_output_file = 'dev_model_outputs_1_debug.txt'
+train_output_file = 'train_model_outputs_1_debug.txt'
 # Test the model
+# with torch.no_grad():
+#     correct = 0
+#     total = 0
+#     predicted_list = []
+#     actual_label_list = []
+#     for i in range(len(dev_labels)):
+#     # for images, labels in test_loader:
+#         images = dev_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
+#         labels = dev_labels[i].type('torch.FloatTensor').to(device)
+#         outputs = model(images)
+#         predicted, _ = torch.max(outputs.data, 1)
+#         total += labels.size(0)
+#         correct += (predicted == labels).sum().item()
+#         actual_label_list.append(dev_labels[i].item())
+#         predicted_list.append(predicted.item())
+#     print('Dev Accuracy of the model on the full dev set: {} %'.format(100 * correct / total)) 
+#     print('Mean Squared Error: ', mean_squared_error(predicted_list, actual_label_list))
+
+# print("Predicted: ", predicted_list)
+# print("Actual: ", actual_label_list)
+# f = open(dev_output_file, "a+")
+# f.write('Predicted: ' + str(predicted_list) + '\n')
+# f.write('Actual: ' + str(actual_label_list) + '\n')
+
+
+
 with torch.no_grad():
     correct = 0
     total = 0
     predicted_list = []
     actual_label_list = []
-    for i in range(len(dev_labels)):
-    # for images, labels in test_loader:
-        images = dev_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
-        labels = dev_labels[i].type('torch.FloatTensor').to(device)
-        outputs = model(images)
-        predicted, _ = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-        actual_label_list.append(dev_labels[i])
-        predicted_list.append(predicted.item())
-    print('Dev Accuracy of the model on the full dev set: {} %'.format(100 * correct / total)) 
-    print('Mean Squared Error: ', mean_squared_error(predicted_list, actual_label_list))
-
-print("Predicted: ", predicted_list)
-print("Actual: ", actual_label_list)
-f = open(dev_output_file, "a+")
-f.write('Predicted: ' + str(predicted_list) + '\n')
-f.write('Actual: ' + str(actual_label_list) + '\n')
-
-
-
-with torch.no_grad():
-    correct = 0
-    total = 0
-    predicted_list = []
-    actual_label_list = []
-    for i in range(len(train_labels)):
+    for i in range(total_step):
     # for images, labels in test_loader:
         images = train_images[i].reshape(-1, sequence_length, input_size).type('torch.FloatTensor').to(device)
         labels = train_labels[i].type('torch.FloatTensor').to(device)
         outputs = model(images)
-        predicted, _ = torch.max(outputs.data, 1)
+        predicted = outputs[0, 0, 0]
+        # predicted, _ = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
         actual_label_list.append(train_labels[i])
-        predicted_list.append(predicted.item())
-    print('Dev Accuracy of the model on the full dev set: {} %'.format(100 * correct / total)) 
+        # predicted_list.append(predicted.item())
+        predicted_list.append(predicted)
+    print('Train Accuracy of the model on the full train set: {} %'.format(100 * correct / total)) 
     print('Mean Squared Error: ', mean_squared_error(predicted_list, actual_label_list))
     
 print("Predicted: ", predicted_list)
@@ -289,6 +334,12 @@ print("Actual: ", actual_label_list)
 f = open(train_output_file, "a+")
 f.write('Predicted: ' + str(predicted_list) + '\n')
 f.write('Actual: ' + str(actual_label_list) + '\n')
+
+import matplotlib.pyplot as plt
+
+print(loss_history)
+plt.plot(iterations, loss_history)
+plt.savefig('Loss.png')
 
 # Save the model checkpoint
 torch.save(model.state_dict(), 'model.ckpt')
