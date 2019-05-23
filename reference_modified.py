@@ -120,18 +120,22 @@ class BiRNN(nn.Module):
         self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
         self.fc = nn.Linear(hidden_size * 2, 1)  # 2 for bidirection
-    
+        self.h0 = None
+        self.c0 = None
+
     def forward(self, x):
         # Set initial states
-        h0 = torch.zeros(self.num_layers*2, x.size(0), self.hidden_size).to(device) # 2 for bidirection 
-        c0 = torch.zeros(self.num_layers*2, x.size(0), self.hidden_size).to(device)
+        if not self.h0:
+            h0 = torch.zeros(self.num_layers*2, x.size(0), self.hidden_size).to(device) # 2 for bidirection 
+            c0 = torch.zeros(self.num_layers*2, x.size(0), self.hidden_size).to(device)
+        else:
+            h0 = self.h0
+            c0 = self.c0
         
         # Forward propagate LSTM
         out, _ = self.lstm(x, (h0, c0))  # out: tensor of shape (batch_size, seq_length, hidden_size*2)
-        print("POST LSTM: ", out)
         # Decode the hidden state of the last time step
-        # out = self.fc(out[:, -1, :])
-        # print("POST FC: ", out)
+        out = self.fc(out[:, -1, :])
         return out
 
 def count_parameters(model):
@@ -196,6 +200,7 @@ loss_history = []
 
 for epoch in range(num_epochs):
     start_time = time.time()
+    # model.hidden = model.init_hidden()
     for i in range(total_step):
     # for i in range(100): #training on small set
     # for i, (images, labels) in enumerate(train_loader):
@@ -282,7 +287,7 @@ for epoch in range(num_epochs):
 
 dev_output_file = 'dev_model_outputs_1_debug.txt'
 train_output_file = 'train_model_outputs_1_debug.txt'
-# Test the model
+# Test the model on the dev set
 # with torch.no_grad():
 #     correct = 0
 #     total = 0
