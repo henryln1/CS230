@@ -24,7 +24,7 @@ num_epochs = 2
 num_classes = 1
 learning_rate = 0.001
 
-BATCH_SIZE = 1
+BATCH_SIZE = 64
 
 class BiRNN(nn.Module):
 	def __init__(self, glove_vec, input_size, hidden_size, num_layers, num_classes):
@@ -91,7 +91,7 @@ for epoch in range(num_epochs):
 		optimizer.zero_grad()
 		loss = 0.
 		train_x, train_y = batch
-		if(len(train_x) == 0):
+		if(train_x.size(1) == 0):
 			continue
 		logits = model.forward(train_x.to(device))
 		loss = loss_fn(logits, train_y.type('torch.FloatTensor').to(device))
@@ -132,9 +132,11 @@ for epoch in range(num_epochs):
 	# Evaulate model on dev data
 	for batch in dev_batches:
 		dev_x, dev_y = batch
+		if(dev_x.size(1) == 0):
+			continue
 		logits = model.forward(dev_x.to(device))
 		total_dev_loss += loss_fn(logits, dev_y.type('torch.FloatTensor').to(device)).item()
-		idxs = torch.argmax(logits, dim=1)
+		idxs = logits
 		num_correct += torch.sum(idxs == torch.round(dev_y.type('torch.FloatTensor')).to(device)).item()
 	dev_acc = num_correct / len(dev_data[0])
 
