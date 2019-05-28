@@ -39,13 +39,6 @@ def read_corpus(file_path, word_vectors = None, device = None):
 	labels = torch.tensor(labels).to(device)
 	return data, labels
 
-	# for line in open(file_path, encoding='latin-1'):
-	# 	sent = line.strip().split(' ')
-	# 	if len(sent) == 0:
-	# 		continue
-	# 	data.append(torch.LongTensor([vocab[word].index for word in sent if word in word_vectors.vocab.keys()]).to(device))
-	# return data
-
 def get_data(glove = None, device = None):
 	pickle_name = C.filenames['pickle']
 	train_file_name = C.filenames['train']
@@ -75,39 +68,7 @@ def get_data(glove = None, device = None):
 
 	return data
 
-# Read in train data
-# train_images = None
-# train_labels = None
-# num_train_examples = 0
-# with open('train_data.csv', encoding="utf8") as file:
-#   reader = csv.reader(file, delimiter=',')
-#   num_train_examples = sum(1 for row in reader)
-
-# with open('train_data.csv', encoding="utf8") as file:
-#   reader = csv.reader(file, delimiter=',')
-#   train_images = np.zeros(shape = (num_train_examples - 1, EXAMPLE_LENGTH, glove_vector_dim))
-#   train_labels = np.zeros(shape = (num_train_examples - 1, 1))
-#   for idx, example in enumerate(reader):
-#     if idx == 0:
-#       continue
-#     _, subreddit, title, score, num_comments, timestamp = tuple(example)  
-#     title_words_list = re.sub(r'[^a-zA-Z ]', '', title).split()
-#     title_words_list = [x.lower() for x in title_words_list]
-#     for j in range(len(title_words_list)):
-#       curr_word = title_words_list[j]
-#       if curr_word in glove_vectors:
-#         train_images[idx-1][j] = glove_vectors[curr_word]
-#         train_labels[idx-1] = float(score)
-
-# # train_images, train_labels = generate_minibatch.export_main(input_size, batch_size)
-# train_images = torch.from_numpy(train_images)
-# train_labels = torch.from_numpy(train_labels)
-
-# test_images, test_labels = generate_minibatch.export_main(input_size, batch_size)
-# # test_images, test_labels = generate_minibatch.export_main(input_size, batch_size)
-# test_images = torch.from_numpy(test_images)
-# test_labels = torch.from_numpy(test_labels)
-
+# Shuffle data
 def shuffle_data(data):
 	data_len = len(data[0])
 	new_indices = np.random.permutation(data_len)
