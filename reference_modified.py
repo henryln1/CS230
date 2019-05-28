@@ -22,9 +22,9 @@ hidden_size = 128
 num_layers = 2
 num_epochs = 2
 num_classes = 1
-learning_rate = 0.001
+learning_rate = 0.0001
 
-BATCH_SIZE = 64
+BATCH_SIZE = 512
 
 class BiRNN(nn.Module):
 	def __init__(self, glove_vec, input_size, hidden_size, num_layers, num_classes):
