@@ -3,5 +3,8 @@ filenames = {
 	'train': 'train_data.csv',
 	'dev': 'dev_data.csv',
 	'test': 'test_data.csv',
-	'pickle': '__pycache__/reddit.pyc'
+	'pickle': '__pycache__/reddit.pyc',
+	'bi_rnn': '__pycache__/bi_rnn.pyc'
 }
+
+NUM_EPOCHS_FOR_CONVERGE = 3

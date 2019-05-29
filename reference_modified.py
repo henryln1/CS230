@@ -1,16 +1,18 @@
-# https://github.com/yunjey/pytorch-tutorial
-# https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html
+# refernce_modified.py
+# Kristy Duong <kristy5@cs.stanford.edu>
+
 import torch 
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
-# import generate_minibatch
 import csv
 import re
 import math
+import sys
 import numpy as np
 
 import util as U
+import constants as C
 
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -24,7 +26,7 @@ num_epochs = 2
 num_classes = 1
 learning_rate = 0.001
 
-BATCH_SIZE = 1
+BATCH_SIZE = 20
 
 class BiRNN(nn.Module):
 	def __init__(self, glove_vec, input_size, hidden_size, num_layers, num_classes):
@@ -57,10 +59,15 @@ print("Loading model...")
 model = BiRNN(glove, input_size, hidden_size, num_layers, num_classes).to(device)
 
 # Loss and optimizer
-# loss_fn = nn.CrossEntropyLoss()
 loss_fn = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 	
+# Logging
+best_dev_loss = sys.maxsize
+best_train_loss = sys.maxsize
+train_losses = []
+dev_losses = []
+
 # Train the model
 for epoch in range(num_epochs):
 	print("Epoch {:} out of {:}".format(epoch + 1, num_epochs))
@@ -91,7 +98,7 @@ for epoch in range(num_epochs):
 		optimizer.zero_grad()
 		loss = 0.
 		train_x, train_y = batch
-		if(len(train_x) == 0):
+		if(train_x.size(1) == 0):
 			continue
 		logits = model.forward(train_x.to(device))
 		loss = loss_fn(logits, train_y.type('torch.FloatTensor').to(device))
@@ -132,12 +139,33 @@ for epoch in range(num_epochs):
 	# Evaulate model on dev data
 	for batch in dev_batches:
 		dev_x, dev_y = batch
+		if(dev_x.size(1) == 0):
+			continue
 		logits = model.forward(dev_x.to(device))
 		total_dev_loss += loss_fn(logits, dev_y.type('torch.FloatTensor').to(device)).item()
-		idxs = torch.argmax(logits, dim=1)
+		# idxs = torch.argmax(logits, dim=1)
+		idx = logits
 		num_correct += torch.sum(idxs == torch.round(dev_y.type('torch.FloatTensor')).to(device)).item()
 	dev_acc = num_correct / len(dev_data[0])
 
 	print("Dev loss is {}".format(total_dev_loss))
 	print("Dev Accuracy: {}".format(dev_acc))
 	# return total_loss / num_updates, total_dev_loss, dev_acc, batches
+
+	# Save best model
+	if total_dev_loss < best_dev_loss:
+		num_epochs_since_best = 0
+		best_dev_loss = total_dev_loss
+		print("New best dev Loss! Saving model. Loss is {}".format(best_dev_loss))
+		print("Dev Accuracy: {}".format(dev_acc))
+
+		full_model_dict = model.state_dict()
+		torch.save(full_model_dict, C.filenames['bi_rnn'])
+	# else:
+	# 	num_epochs_since_best += 1
+	# 	if num_epochs_since_best > C.NUM_EPOCHS_FOR_CONVERGE:
+	# 		break
+	# if avg_train_loss < best_train_loss:
+	# 	best_train_loss = avg_train_loss
+
+U.plot_losses(train_losses, dev_losses)

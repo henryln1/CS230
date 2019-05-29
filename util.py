@@ -1,7 +1,8 @@
 # util.py
-# Kristy Duong <kristy5@stanford.edu>
+# Kristy Duong <kristy5@cs.stanford.edu>
 
 import gensim.downloader as api
+import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 import csv
@@ -11,6 +12,19 @@ import os
 import re
 
 import constants as C
+
+def plot_losses(train_losses, dev_losses, output_file=None):
+	plt.plot(range(len(train_losses)), train_losses)
+	plt.plot(range(len(dev_losses)), dev_losses)
+	plt.xlabel('Epoch')
+	plt.ylabel('Loss')
+	plt.legend(('Train Loss', 'Dev Loss'))
+	if output_file == None:
+		output_file = 'plots/graph.png'
+	elif output_file[-3:] is not 'png':
+		output_file += '.png'
+	plt.savefig(output_file)
+	print('Saved graph!')
 
 def read_corpus(file_path, word_vectors = None, device = None):
 	""" Read file, where each sentence is dilineated by a `\n`.
