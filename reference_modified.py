@@ -20,11 +20,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # Hyper-parameters
 # sequence_length = 100
 input_size = 50
-hidden_size = 128
+hidden_size = 1024
 num_layers = 2
-num_epochs = 2
+num_epochs = 5
 num_classes = 1
-learning_rate = 0.001
+learning_rate = 0.00001
 
 BATCH_SIZE = 20
 
@@ -68,6 +68,10 @@ best_train_loss = sys.maxsize
 train_losses = []
 dev_losses = []
 
+# model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+# params = sum([np.prod(p.size()) for p in model_parameters])
+# print("Number of Trainable Parameters: ", params)
+
 # Train the model
 for epoch in range(num_epochs):
 	print("Epoch {:} out of {:}".format(epoch + 1, num_epochs))
@@ -110,8 +114,8 @@ for epoch in range(num_epochs):
 		idxs = logits
 		# idxs = torch.argmax(logits, dim=1)
 		num_correct += torch.sum(idxs == torch.round(train_y.type('torch.FloatTensor')).to(device)).item()
-		print("Predictions: {}".format(idxs))
-		print("Actual: {}".format(train_y))
+		# print("Predictions: {}".format(idxs))
+		# print("Actual: {}".format(train_y))
 		print("Loss: {}".format(loss) )
 	train_acc = num_correct / len(train_data[0])
 		# num_updates += 1
