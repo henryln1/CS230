@@ -116,11 +116,11 @@ for epoch in range(num_epochs):
 		idxs = logits
 		# idxs = torch.argmax(logits, dim=1)
 		num_correct += torch.sum(idxs == torch.round(train_y.type('torch.FloatTensor')).to(device)).item()
-		# print("Predictions: {}".format(idxs))
-		# print("Actual: {}".format(train_y))
+		print("Predictions: {}".format(idxs))
+		print("Actual: {}".format(train_y))
 		counter += 1
-		if counter % 25 == 0:
-			print("Loss: {}".format(loss) )
+		# if counter % 25 == 0:
+		print("Loss: {}".format(loss) )
 		train_losses.append(loss.item())
 	train_acc = num_correct / len(train_data[0])
 		# num_updates += 1
