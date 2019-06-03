@@ -28,7 +28,15 @@ def plot_losses(train_losses, dev_losses):
 	plt.savefig("graph_dev_loss_06_03_19.png")
 	print('Saved graph!')
 
-def read_corpus(file_path, word_vectors = None, device = None):
+def process_as_classification(label):
+	upper_bounds = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+	for idx in range(1, len(upper_bounds)):
+		if label in range(upper_bounds[idx - 1], upper_bounds[idx]):
+			return idx - 1
+	if label >= 1000:
+		return len(upper_bounds)
+
+def read_corpus(file_path, word_vectors = None, device = None, classification = False):
 	""" Read file, where each sentence is dilineated by a `\n`.
 	@param file_path (str): path to file containing corpus
 	@return data: 2D list. First dimension is each line (example),
@@ -51,7 +59,10 @@ def read_corpus(file_path, word_vectors = None, device = None):
 			if len(title_words_list) == 0:
 				continue
 			data.append(torch.LongTensor([vocab[word].index for word in title_words_list if word in word_vectors.vocab.keys()]).to(device))
-			labels.append(int(score))
+			if classification:
+				labels.append(process_as_classification(int(score)))
+			else:
+				labels.append(int(score))
 	labels = torch.tensor(labels).to(device)
 	return data, labels
 
