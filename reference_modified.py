@@ -22,7 +22,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 input_size = 50
 hidden_size = 2048
 num_layers = 2
-num_epochs = 100
+num_epochs = 50
 num_classes = 1
 learning_rate = 0.0001
 
@@ -67,7 +67,7 @@ best_dev_loss = sys.maxsize
 best_train_loss = sys.maxsize
 train_losses = []
 dev_losses = []
-
+total_loss_history = []
 # model_parameters = filter(lambda p: p.requires_grad, model.parameters())
 # params = sum([np.prod(p.size()) for p in model_parameters])
 # print("Number of Trainable Parameters: ", params)
@@ -99,6 +99,7 @@ for epoch in range(num_epochs):
 	num_correct = 0
 	# Train model
 	print("Number of Training Batches: ", len(batches))
+	counter = 0
 	for batch in batches:
 		optimizer.zero_grad()
 		loss = 0.
@@ -117,7 +118,9 @@ for epoch in range(num_epochs):
 		num_correct += torch.sum(idxs == torch.round(train_y.type('torch.FloatTensor')).to(device)).item()
 		# print("Predictions: {}".format(idxs))
 		# print("Actual: {}".format(train_y))
-		print("Loss: {}".format(loss) )
+		counter += 1:
+		if counter % 25 == 0:
+			print("Loss: {}".format(loss) )
 		train_losses.append(loss.item())
 	train_acc = num_correct / len(train_data[0])
 		# num_updates += 1
@@ -125,6 +128,7 @@ for epoch in range(num_epochs):
 		# loss_meter.update(loss.item())
 
 	print("Train loss is {}".format(total_loss))
+	total_loss_history.append(total_loss)
 	print("Train Accuracy: {}".format(train_acc))
 
 	model.eval()
@@ -178,3 +182,4 @@ for epoch in range(num_epochs):
 print(train_losses)
 print(dev_losses)
 U.plot_losses(train_losses, dev_losses)
+print("Total Loss:" , total_loss_history)
