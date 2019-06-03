@@ -20,13 +20,13 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # Hyper-parameters
 # sequence_length = 100
 input_size = 50
-hidden_size = 1024
+hidden_size = 2048
 num_layers = 2
-num_epochs = 5
+num_epochs = 25
 num_classes = 1
-learning_rate = 0.00001
+learning_rate = 0.001
 
-BATCH_SIZE = 20
+BATCH_SIZE = 512
 
 class BiRNN(nn.Module):
 	def __init__(self, glove_vec, input_size, hidden_size, num_layers, num_classes):
@@ -60,6 +60,7 @@ model = BiRNN(glove, input_size, hidden_size, num_layers, num_classes).to(device
 
 # Loss and optimizer
 loss_fn = nn.MSELoss()
+loss_fn = nn.SmoothL1Loss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 	
 # Logging
@@ -67,7 +68,7 @@ best_dev_loss = sys.maxsize
 best_train_loss = sys.maxsize
 train_losses = []
 dev_losses = []
-
+total_loss_history = []
 # model_parameters = filter(lambda p: p.requires_grad, model.parameters())
 # params = sum([np.prod(p.size()) for p in model_parameters])
 # print("Number of Trainable Parameters: ", params)
@@ -98,6 +99,8 @@ for epoch in range(num_epochs):
 
 	num_correct = 0
 	# Train model
+	print("Number of Training Batches: ", len(batches))
+	counter = 0
 	for batch in batches:
 		optimizer.zero_grad()
 		loss = 0.
@@ -114,15 +117,19 @@ for epoch in range(num_epochs):
 		idxs = logits
 		# idxs = torch.argmax(logits, dim=1)
 		num_correct += torch.sum(idxs == torch.round(train_y.type('torch.FloatTensor')).to(device)).item()
-		# print("Predictions: {}".format(idxs))
-		# print("Actual: {}".format(train_y))
+		print("Predictions: {}".format(idxs))
+		print("Actual: {}".format(train_y))
+		counter += 1
+		# if counter % 25 == 0:
 		print("Loss: {}".format(loss) )
+		train_losses.append(loss.item())
 	train_acc = num_correct / len(train_data[0])
 		# num_updates += 1
 
 		# loss_meter.update(loss.item())
 
 	print("Train loss is {}".format(total_loss))
+	total_loss_history.append(total_loss)
 	print("Train Accuracy: {}".format(train_acc))
 
 	model.eval()
@@ -141,6 +148,7 @@ for epoch in range(num_epochs):
 			dev_data[1][start:end]))
 
 	# Evaulate model on dev data
+	print("Number of dev batches: ", len(dev_batches))
 	for batch in dev_batches:
 		dev_x, dev_y = batch
 		if(dev_x.size(1) == 0):
@@ -149,9 +157,9 @@ for epoch in range(num_epochs):
 		total_dev_loss += loss_fn(logits, dev_y.type('torch.FloatTensor').to(device)).item()
 		# idxs = torch.argmax(logits, dim=1)
 		idx = logits
-		num_correct += torch.sum(idxs == torch.round(dev_y.type('torch.FloatTensor')).to(device)).item()
+		num_correct += torch.sum(idx == torch.round(dev_y.type('torch.FloatTensor')).to(device)).item()
 	dev_acc = num_correct / len(dev_data[0])
-
+	dev_losses.append(total_dev_loss)
 	print("Dev loss is {}".format(total_dev_loss))
 	print("Dev Accuracy: {}".format(dev_acc))
 	# return total_loss / num_updates, total_dev_loss, dev_acc, batches
@@ -172,4 +180,7 @@ for epoch in range(num_epochs):
 	# if avg_train_loss < best_train_loss:
 	# 	best_train_loss = avg_train_loss
 
+print(train_losses)
+print(dev_losses)
 U.plot_losses(train_losses, dev_losses)
+print("Total Loss:" , total_loss_history)
