@@ -60,6 +60,7 @@ model = BiRNN(glove, input_size, hidden_size, num_layers, num_classes).to(device
 
 # Loss and optimizer
 loss_fn = nn.MSELoss()
+loss_fn = nn.SmoothL1Loss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 	
 # Logging
