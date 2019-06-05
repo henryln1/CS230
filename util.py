@@ -13,19 +13,30 @@ import re
 
 import constants as C
 
+def plot_all_losses(train_losses):
+	plt.plot(range(len(train_losses)), train_losses)
+	print("Length of train losses:", len(train_losses))
+	print("Batch Loss: ", train_losses)
+	plt.xlabel('Iterations')
+	plt.ylabel('Loss')
+	plt.title('Loss Curve')
+	plt.savefig('graph_batch_loss_06_05_19_classification.png')
+	plt.close()
+
 def plot_losses(train_losses, dev_losses):
 	plt.plot(range(len(train_losses)), train_losses)
 	plt.xlabel('Epoch')
 	plt.ylabel('Loss')
 	plt.title('Training Loss')
 	# plt.legend(('Train Loss', 'Dev Loss'))
-	plt.savefig("graph_train_loss_06_04_19.png")
+	plt.savefig("graph_train_loss_06_05_19_classification.png")
 	plt.close()
 	plt.plot(range(len(dev_losses)), dev_losses)
 	plt.xlabel('Epoch')
 	plt.ylabel('Loss')
 	plt.title('Dev Loss')
-	plt.savefig("graph_dev_loss_06_04_19.png")
+	plt.savefig("graph_dev_loss_06_05_19_classification.png")
+	plt.close()
 	print('Saved graph!')
 
 def process_as_classification(label):
