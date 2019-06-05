@@ -8,6 +8,7 @@ filenames = {
 	# 'test': 'small.csv',
 	'pickle': '__pycache__/reddit.pyc',
 	'bi_rnn': '__pycache__/bi_rnn.pyc',
+	'class_rnn': '__pycache__/class_rnn.pyc',
 	'classification_pickle': '__pycache__/class_reddit.pyc'
 }
 
