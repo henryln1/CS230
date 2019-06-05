@@ -19,13 +19,13 @@ def plot_losses(train_losses, dev_losses):
 	plt.ylabel('Loss')
 	plt.title('Training Loss')
 	# plt.legend(('Train Loss', 'Dev Loss'))
-	plt.savefig("graph_train_loss_06_03_19.png")
+	plt.savefig("graph_train_loss_06_04_19.png")
 	plt.close()
 	plt.plot(range(len(dev_losses)), dev_losses)
 	plt.xlabel('Epoch')
 	plt.ylabel('Loss')
 	plt.title('Dev Loss')
-	plt.savefig("graph_dev_loss_06_03_19.png")
+	plt.savefig("graph_dev_loss_06_04_19.png")
 	print('Saved graph!')
 
 def process_as_classification(label):
