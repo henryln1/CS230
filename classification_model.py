@@ -150,7 +150,7 @@ for epoch in range(num_epochs):
 		total_dev_loss += loss_fn(logits, dev_y.to(device)).item()
 		idxs = torch.argmax(logits, dim=1)
 		# idxs = logits
-		num_correct += torch.sum(idxs == torch.round(dev_y.type('torch.FloatTensor')).to(device)).item()
+		num_correct += torch.sum(idxs == dev_y.to(device).item()
 	dev_acc = num_correct / len(dev_data[0])
 
 	print("Dev loss is {}".format(total_dev_loss))
