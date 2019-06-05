@@ -29,12 +29,17 @@ def plot_losses(train_losses, dev_losses):
 	print('Saved graph!')
 
 def process_as_classification(label):
+	"""
+	Processes Reddit score into classification range
+	@param label (int): Reddit score
+	@return: classification label
+	"""
 	upper_bounds = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 	for idx in range(1, len(upper_bounds)):
 		if label in range(upper_bounds[idx - 1], upper_bounds[idx]):
 			return idx - 1
 	if label >= 1000:
-		return len(upper_bounds)
+		return len(upper_bounds) - 1
 
 def read_corpus(file_path, word_vectors = None, device = None, classification = False):
 	""" Read file, where each sentence is dilineated by a `\n`.
@@ -66,26 +71,29 @@ def read_corpus(file_path, word_vectors = None, device = None, classification = 
 	labels = torch.tensor(labels).to(device)
 	return data, labels
 
-def get_data(glove = None, device = None):
+def get_data(glove = None, device = None, classification = False):
 	pickle_name = C.filenames['pickle']
 	train_file_name = C.filenames['train']
 	dev_file_name = C.filenames['dev']
 	test_file_name = C.filenames['test']
+
+	if classification:
+		pickle_name = C.filenames['classification_pickle']
 
 	try:
 		data = load_large_pickle(pickle_name)
 		print('Continuing with loaded pickle for padding data...')
 	except Exception as e:
 		print('Unable to find pre-processed data. Pre-processing new...')
-		train_data, train_labels = read_corpus(train_file_name, glove, device)
+		train_data, train_labels = read_corpus(train_file_name, glove, device, classification)
 		full_train_data = [train_data, train_labels]
 		shuffle_data(full_train_data)
 
-		dev_data, dev_labels = read_corpus(dev_file_name, glove, device)
+		dev_data, dev_labels = read_corpus(dev_file_name, glove, device, classification)
 		full_dev_data = [dev_data, dev_labels]
 		shuffle_data(full_dev_data)
 
-		test_data, test_labels = read_corpus(test_file_name, glove, device)
+		test_data, test_labels = read_corpus(test_file_name, glove, device, classification)
 		full_test_data = [test_data, test_labels]
 		shuffle_data(full_test_data)
 

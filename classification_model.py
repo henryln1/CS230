@@ -23,7 +23,7 @@ input_size = 50
 hidden_size = 1024
 num_layers = 2
 num_epochs = 5
-num_classes = 1
+num_classes = 20
 learning_rate = 0.0001
 
 BATCH_SIZE = 20
@@ -47,13 +47,14 @@ class BiRNN(nn.Module):
 		out, _ = self.lstm(embedding, (h0, c0))  # out: tensor of shape (batch_size, seq_length, hidden_size*2)
 		# Decode the hidden state of the last time step
 		out = self.fc(out[:, -1, :])
-		return out.view(-1)
+		# print(out)
+		return out
 
 print("Loading GloVe vectors...")
 glove = U.load_glove()
 
 print("Reading in data...")
-train_data, dev_data, test_data = U.get_data(glove = glove, device = device)
+train_data, dev_data, test_data = U.get_data(glove = glove, device = device, classification = True)
 
 print("Loading model...")
 model = BiRNN(glove, input_size, hidden_size, num_layers, num_classes).to(device)
@@ -105,15 +106,15 @@ for epoch in range(num_epochs):
 		if(train_x.size(1) == 0):
 			continue
 		logits = model.forward(train_x.to(device))
-		loss = loss_fn(logits, train_y.type('torch.FloatTensor').to(device))
+		loss = loss_fn(logits, train_y.to(device))
 		loss.backward()
 		optimizer.step()
 
 		# print("Logits: {}".format(logits))
 		total_loss += loss.item()
-		idxs = logits
-		# idxs = torch.argmax(logits, dim=1)
-		num_correct += torch.sum(idxs == torch.round(train_y.type('torch.FloatTensor')).to(device)).item()
+		# idxs = logits
+		idxs = torch.argmax(logits, dim=1)
+		num_correct += torch.sum(idxs == train_y.to(device)).item()
 		# print("Predictions: {}".format(idxs))
 		# print("Actual: {}".format(train_y))
 		print("Loss: {}".format(loss) )
@@ -146,9 +147,9 @@ for epoch in range(num_epochs):
 		if(dev_x.size(1) == 0):
 			continue
 		logits = model.forward(dev_x.to(device))
-		total_dev_loss += loss_fn(logits, dev_y.type('torch.FloatTensor').to(device)).item()
-		# idxs = torch.argmax(logits, dim=1)
-		idx = logits
+		total_dev_loss += loss_fn(logits, dev_y.to(device)).item()
+		idxs = torch.argmax(logits, dim=1)
+		# idxs = logits
 		num_correct += torch.sum(idxs == torch.round(dev_y.type('torch.FloatTensor')).to(device)).item()
 	dev_acc = num_correct / len(dev_data[0])
 
