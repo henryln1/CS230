@@ -22,11 +22,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 input_size = 50
 hidden_size = 1024
 num_layers = 2
-num_epochs = 5
+num_epochs = 25
 num_classes = 20
-learning_rate = 0.0001
+learning_rate = 0.005
 
-BATCH_SIZE = 20
+BATCH_SIZE = 64
 
 class BiRNN(nn.Module):
 	def __init__(self, glove_vec, input_size, hidden_size, num_layers, num_classes):
@@ -115,8 +115,8 @@ for epoch in range(num_epochs):
 		# idxs = logits
 		idxs = torch.argmax(logits, dim=1)
 		num_correct += torch.sum(idxs == train_y.to(device)).item()
-		# print("Predictions: {}".format(idxs))
-		# print("Actual: {}".format(train_y))
+		print("Train Predictions: {}".format(idxs))
+		print("Train Actual: {}".format(train_y))
 		print("Loss: {}".format(loss) )
 	train_acc = num_correct / len(train_data[0])
 		# num_updates += 1
@@ -149,8 +149,11 @@ for epoch in range(num_epochs):
 		logits = model.forward(dev_x.to(device))
 		total_dev_loss += loss_fn(logits, dev_y.to(device)).item()
 		idxs = torch.argmax(logits, dim=1)
+		print("Dev Predictions: {}".format(idxs))
+		print("Dev Actual: {}".format(dev_y))
 		# idxs = logits
-		num_correct += torch.sum(idxs == dev_y.to(device).item()
+		num_correct += torch.sum(idxs == dev_y.to(device)).item()
+
 	dev_acc = num_correct / len(dev_data[0])
 
 	print("Dev loss is {}".format(total_dev_loss))
@@ -165,7 +168,7 @@ for epoch in range(num_epochs):
 		print("Dev Accuracy: {}".format(dev_acc))
 
 		full_model_dict = model.state_dict()
-		torch.save(full_model_dict, C.filenames['bi_rnn'])
+		torch.save(full_model_dict, C.filenames['class_rnn'])
 	# else:
 	# 	num_epochs_since_best += 1
 	# 	if num_epochs_since_best > C.NUM_EPOCHS_FOR_CONVERGE:
