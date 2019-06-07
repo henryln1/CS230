@@ -22,9 +22,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 input_size = 50
 hidden_size = 1024
 num_layers = 2
-num_epochs = 5
+num_epochs = 10
 num_classes = 20
-learning_rate = 0.005
+learning_rate = 0.0025
 
 BATCH_SIZE = 64
 
@@ -178,5 +178,5 @@ for epoch in range(num_epochs):
 	# 	best_train_loss = avg_train_loss
 
 U.plot_losses(train_losses, dev_losses)
-print("BAtch loss :", individual_training_batch_losses)
+print("Batch loss :", individual_training_batch_losses)
 U.plot_all_losses(individual_training_batch_losses)
