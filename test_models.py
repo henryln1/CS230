@@ -20,14 +20,13 @@ from classification_model import ClassBiRNN
 input_size = 50
 hidden_size = 1024
 num_layers = 2
+BATCH_SIZE = 64
 
 # Regression model hyperparams
 r_num_classes = 1
-R_BATCH_SIZE = 256
 
 # Classification model hyperparams
 c_num_classes = 20
-C_BATCH_SIZE = 64
 
 print("Loading GloVe vectors...")
 glove = U.load_glove()
@@ -44,9 +43,9 @@ regression_model = ClassBiRNN(glove, input_size, hidden_size, num_layers, c_num_
 # Test regression model
 output_path = C.filenames['bi_rnn']
 print("Testing regression model...")
-test_model(model, output_path, test_data, R_BATCH_SIZE)
+test_model(model, output_path, test_data, BATCH_SIZE)
 
 # Test classification model
 output_path = C.filenames['class_rnn']
 print("Testing classification model...")
-U.test_model(class_model, output_path, test_data, C_BATCH_SIZE, classification = True)
+U.test_model(class_model, output_path, test_data, BATCH_SIZE, classification = True)
