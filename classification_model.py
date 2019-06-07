@@ -149,8 +149,8 @@ for epoch in range(num_epochs):
 		logits = model.forward(dev_x.to(device))
 		total_dev_loss += loss_fn(logits, dev_y.to(device)).item()
 		idxs = torch.argmax(logits, dim=1)
-		print("Dev Predictions: {}".format(idxs))
-		print("Dev Actual: {}".format(dev_y))
+		# print("Dev Predictions: {}".format(idxs))
+		# print("Dev Actual: {}".format(dev_y))
 		# idxs = logits
 		num_correct += torch.sum(idxs == dev_y.to(device)).item()
 
@@ -178,5 +178,4 @@ for epoch in range(num_epochs):
 	# 	best_train_loss = avg_train_loss
 
 U.plot_losses(train_losses, dev_losses)
-print("Batch loss :", individual_training_batch_losses)
 U.plot_all_losses(individual_training_batch_losses)
