@@ -169,7 +169,7 @@ for epoch in range(num_epochs):
 		print("Dev Accuracy: {}".format(dev_acc))
 
 		full_model_dict = model.state_dict()
-		torch.save(full_model_dict, C.filenames['class_rnn'])
+		torch.save(full_model_dict, C.filenames['class_rnn_v2'])
 	# else:
 	# 	num_epochs_since_best += 1
 	# 	if num_epochs_since_best > C.NUM_EPOCHS_FOR_CONVERGE:
