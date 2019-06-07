@@ -13,12 +13,14 @@ import re
 
 import constants as C
 
-def evaluate_model(model, data, batch_size = 50, device=None, classification = False):
+def evaluate_model(model, data, batch_size = 50, device=None, classification = False, outputs = None):
 	model.eval()
 	n_minibatches = math.ceil(len(data[0]) / batch_size)
 	batches = []
 	total_loss = 0.
 	num_correct = 0
+	predicted = []
+	actual = []
 	for i in range(n_minibatches):
 		start = i * batch_size
 		end = start + batch_size
@@ -41,11 +43,16 @@ def evaluate_model(model, data, batch_size = 50, device=None, classification = F
 			idxs = logits
 			num_correct += torch.sum(idxs == torch.round(y.type('torch.FloatTensor')).to(device)).item()
 
+		predicted += idxs.tolist()
+		actual += y.tolist()
 	accuracy = num_correct / len(data[0])
 
 	print("Test Loss: {}".format(total_loss))
 	print("Accuracy: {}".format(accuracy))
-
+	with open(outputs, 'w') as f:
+		f.write('Predicted: ', predicted)
+		f.write('Actual: ', actual)
+	f.close()
 	return total_loss, accuracy
 
 def test_model(model, output_path, test_data, batch_size = 50, device=None, classification = False):

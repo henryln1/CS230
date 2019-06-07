@@ -43,9 +43,9 @@ regression_model = ClassBiRNN(glove, input_size, hidden_size, num_layers, c_num_
 # Test regression model
 output_path = C.filenames['bi_rnn']
 print("Testing regression model...")
-test_model(model, output_path, test_data, BATCH_SIZE)
+U.test_model(model, output_path, test_data, BATCH_SIZE, outputs = 'regression_results.txt')
 
 # Test classification model
 output_path = C.filenames['class_rnn']
 print("Testing classification model...")
-U.test_model(class_model, output_path, test_data, BATCH_SIZE, classification = True)
+U.test_model(class_model, output_path, test_data, BATCH_SIZE, classification = True, outputs = 'classification_results.txt')
