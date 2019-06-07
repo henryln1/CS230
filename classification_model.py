@@ -179,6 +179,3 @@ for epoch in range(num_epochs):
 
 U.plot_losses(train_losses, dev_losses)
 U.plot_all_losses(individual_training_batch_losses)
-
-output_path = C.filenames['class_rnn']
-U.test_model(model, output_path, test_data, BATCH_SIZE, classification = True)

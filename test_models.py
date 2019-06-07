@@ -41,9 +41,9 @@ print("Loading classification model...")
 regression_model = ClassBiRNN(glove, input_size, hidden_size, num_layers, c_num_classes).to(device)
 
 # Test regression model
-output_path = C.filenames['bi_rnn']
-print("Testing regression model...")
-U.test_model(model, output_path, test_data, BATCH_SIZE, outputs = 'regression_results.txt')
+# output_path = C.filenames['bi_rnn']
+# print("Testing regression model...")
+# U.test_model(model, output_path, test_data, BATCH_SIZE, outputs = 'regression_results.txt')
 
 # Test classification model
 output_path = C.filenames['class_rnn']
