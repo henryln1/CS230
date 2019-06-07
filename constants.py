@@ -5,7 +5,7 @@ filenames = {
 	'test': 'test_file_8k_max_score_capped=1000.csv',
 	'pickle': '__pycache__/reddit.pyc',
 	'bi_rnn': '__pycache__/bi_rnn.pyc',
-	'class_rnn': 'models/class_rnn_v3.pyc',
+	'class_rnn': 'models/class_rnn_v4_learning_rate=0.00001.pyc',
 	'classification_pickle': '__pycache__/class_reddit.pyc'
 }
 
