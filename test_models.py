@@ -14,6 +14,9 @@ import numpy as np
 import util as U
 import constants as C
 
+from reference_modified import BiRNN
+from classification_model import ClassBiRNN
+
 input_size = 50
 hidden_size = 1024
 num_layers = 2
@@ -36,7 +39,7 @@ print("Loading regression model...")
 class_model = BiRNN(glove, input_size, hidden_size, num_layers, r_num_classes).to(device)
 
 print("Loading classification model...")
-regression_model = BiRNN(glove, input_size, hidden_size, num_layers, c_num_classes).to(device)
+regression_model = ClassBiRNN(glove, input_size, hidden_size, num_layers, c_num_classes).to(device)
 
 # Test regression model
 output_path = C.filenames['bi_rnn']

@@ -28,9 +28,9 @@ learning_rate = 0.00001
 
 BATCH_SIZE = 64
 
-class BiRNN(nn.Module):
+class ClassBiRNN(nn.Module):
 	def __init__(self, glove_vec, input_size, hidden_size, num_layers, num_classes):
-		super(BiRNN, self).__init__()
+		super(ClassBiRNN, self).__init__()
 		self.hidden_size = hidden_size
 		self.num_layers = num_layers
 		self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
@@ -57,7 +57,7 @@ print("Reading in data...")
 train_data, dev_data, test_data = U.get_data(glove = glove, device = device, classification = True)
 
 print("Loading model...")
-model = BiRNN(glove, input_size, hidden_size, num_layers, num_classes).to(device)
+model = ClassBiRNN(glove, input_size, hidden_size, num_layers, num_classes).to(device)
 
 # Loss and optimizer
 loss_fn = nn.CrossEntropyLoss()
