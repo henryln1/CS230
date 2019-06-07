@@ -13,6 +13,54 @@ import re
 
 import constants as C
 
+def evaluate_model(model, data, batch_size = 50, device=None, classification = False):
+	model.eval()
+	n_minibatches = math.ceil(len(data[0]) / batch_size)
+	batches = []
+	total_loss = 0.
+	num_correct = 0
+	for i in range(n_minibatches):
+		start = i * batch_size
+		end = start + batch_size
+		batches.append((
+			nn.utils.rnn.pad_sequence(
+				data[0][start:end]).transpose(0, 1),
+			data[1][start:end]))
+	for batch in batches:
+		x, y = batch
+		if(x.size(1) == 0):
+			continue
+		logits = model.forward(x.to(device))
+
+		if classification:
+			total_loss += nn.CrossEntropyLoss()(logits, y.to(device)).item()
+			idxs = torch.argmax(logits, dim=1)
+			num_correct += torch.sum(idxs == y.to(device)).item()
+		else:
+			total_loss += nn.SmoothL1Loss()(logits, y.type('torch.FloatTensor').to(device)).item()
+			idxs = logits
+			num_correct += torch.sum(idxs == torch.round(y.type('torch.FloatTensor')).to(device)).item()
+
+	accuracy = num_correct / len(data[0])
+
+	print("Test Loss: {}".format(total_loss))
+	print("Accuracy: {}".format(accuracy))
+
+	return total_loss, accuracy
+
+def test_model(model, output_path, test_data, batch_size = 50, device=None, classification = False):
+	print(80 * "=")
+	print("Testing")
+	print(80 * "=")
+	print("Restoring the best model weights found on the dev set...")
+	model_dict = torch.load(output_path)
+	model.load_state_dict(model_dict)
+	print("Final evaluation on test set")
+	print("Evaluating model on test data...")
+	loss, accuracy = evaluate_model(model, test_data, batch_size, device)
+
+	return loss, accuracy
+
 def plot_all_losses(train_losses):
 	plt.plot(range(len(train_losses)), train_losses)
 	print("Length of train losses:", len(train_losses))
