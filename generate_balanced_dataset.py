@@ -6,12 +6,12 @@ random.seed(1)
 full_data_file = 'train_data.csv'
 full_dev_data_file = 'dev_data.csv'
 full_test_data_file = 'test_data.csv'
-balanced_data_file = 'train_data_data_augmentation_and_max_score_capped=1000_25k_examples.csv'
+balanced_data_file = 'train_data_data_augmentation_and_max_score_capped=1000_60k_examples.csv'
 
 
-dev_file = 'dev_data_5k_max_score_capped=1000.csv'
-test_file = 'test_file_5k_max_score_capped=1000.csv'
-max_number = 5000
+dev_file = 'dev_data_8k_max_score_capped=1000.csv'
+test_file = 'test_file_8k_max_score_capped=1000.csv'
+max_number = 8000
 
 threshold = 1000 #max score
 
@@ -98,10 +98,10 @@ with open(full_data_file, newline = '') as f:
 print("Shuffling")
 random.shuffle(small_scores_list)
 
-max_number_small_score_examples = 20000
+max_number_small_score_examples = 50000
 small_scores_list = small_scores_list[:max_number_small_score_examples]
 
-while len(large_scores_list) < 5000:
+while len(large_scores_list) < 10000:
 	large_scores_list += large_scores_list
 
 print("Length of Large: ", len(large_scores_list))
