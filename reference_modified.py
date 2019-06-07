@@ -59,7 +59,7 @@ print("Loading model...")
 model = BiRNN(glove, input_size, hidden_size, num_layers, num_classes).to(device)
 
 # Loss and optimizer
-loss_fn = nn.MSELoss()
+# loss_fn = nn.MSELoss()
 loss_fn = nn.SmoothL1Loss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 	
@@ -180,7 +180,10 @@ for epoch in range(num_epochs):
 	# if avg_train_loss < best_train_loss:
 	# 	best_train_loss = avg_train_loss
 
-print(train_losses)
-print(dev_losses)
+# print(train_losses)
+# print(dev_losses)
 U.plot_losses(train_losses, dev_losses)
-print("Total Loss:" , total_loss_history)
+# print("Total Loss:" , total_loss_history)
+
+output_path = C.filenames['bi_rnn']
+test_model(model, output_path, test_data, BATCH_SIZE)
