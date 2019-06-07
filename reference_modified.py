@@ -186,4 +186,4 @@ U.plot_losses(train_losses, dev_losses)
 # print("Total Loss:" , total_loss_history)
 
 output_path = C.filenames['bi_rnn']
-test_model(model, output_path, test_data, BATCH_SIZE)
+U.test_model(model, output_path, test_data, BATCH_SIZE)
