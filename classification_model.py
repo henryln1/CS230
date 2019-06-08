@@ -40,7 +40,6 @@ class ClassBiRNN(nn.Module):
 	
 	def forward(self, x):
 		# Set initial states
-		print("forward")
 		embedding = self.embed(x) # B x L x E (batch x input_length x embedding_dim)
 		h0 = torch.zeros(self.num_layers*2, embedding.size(0), self.hidden_size).to(device) # 2 for bidirection 
 		c0 = torch.zeros(self.num_layers*2, embedding.size(0), self.hidden_size).to(device)
@@ -121,6 +120,7 @@ for epoch in range(num_epochs):
 		individual_training_batch_losses.append(loss.item())
 	train_acc = num_correct / len(train_data[0])
 		# num_updates += 1
+		print("Epoch:", epoch, "Iteration:", num_updates, "Loss:", loss.item()
 
 		# loss_meter.update(loss.item())
 	train_losses.append(total_loss)
