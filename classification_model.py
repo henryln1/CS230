@@ -111,10 +111,10 @@ for epoch in range(num_epochs):
 		loss.backward()
 		optimizer.step()
 		print("Labels:", train_y)
-		print("Logits: {}".format(logits))
 		total_loss += loss.item()
 		# idxs = logits
 		idxs = torch.argmax(logits, dim=1)
+		print("Predicted:", idxs)
 		num_correct += torch.sum(idxs == train_y.to(device)).item()
 		# print("Loss: {}".format(loss) )
 		individual_training_batch_losses.append(loss.item())
