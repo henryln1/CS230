@@ -21,7 +21,7 @@ import torchvision.transforms as transforms
 import constants as C
 
 
-def evaluate_model(model, data, batch_size = 50, device=None, classification = False, outputs = None):
+def evaluate_model(model, data, batch_size = 50, device, classification = False, outputs = None):
 	model.eval()
 	n_minibatches = math.ceil(len(data[0]) / batch_size)
 	batches = []
@@ -36,6 +36,7 @@ def evaluate_model(model, data, batch_size = 50, device=None, classification = F
 			nn.utils.rnn.pad_sequence(
 				data[0][start:end]).transpose(0, 1),
 			data[1][start:end]))
+	print("Device:", device)
 	for batch in batches:
 		x, y = batch
 		if(x.size(1) == 0):
@@ -63,7 +64,7 @@ def evaluate_model(model, data, batch_size = 50, device=None, classification = F
 	f.close()
 	return total_loss, accuracy
 
-def test_model(model, output_path, test_data, batch_size = 50, device=None, classification = False, outputs = None):
+def test_model(model, output_path, test_data, batch_size = 50, device, classification = False, outputs = None):
 	print(80 * "=")
 	print("Testing")
 	print(80 * "=")
