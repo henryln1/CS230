@@ -34,8 +34,8 @@ glove = U.load_glove()
 print("Reading in data...")
 train_data, dev_data, test_data = U.get_data(glove = glove, device = device)
 
-print("Loading regression model...")
-class_model = BiRNN(glove, input_size, hidden_size, num_layers, r_num_classes).to(device)
+# print("Loading regression model...")
+# class_model = BiRNN(glove, input_size, hidden_size, num_layers, r_num_classes).to(device)
 
 print("Loading classification model...")
 regression_model = ClassBiRNN(glove, input_size, hidden_size, num_layers, c_num_classes).to(device)
