@@ -40,6 +40,7 @@ class ClassBiRNN(nn.Module):
 	
 	def forward(self, x):
 		# Set initial states
+		print("forward")
 		embedding = self.embed(x) # B x L x E (batch x input_length x embedding_dim)
 		h0 = torch.zeros(self.num_layers*2, embedding.size(0), self.hidden_size).to(device) # 2 for bidirection 
 		c0 = torch.zeros(self.num_layers*2, embedding.size(0), self.hidden_size).to(device)
