@@ -20,6 +20,8 @@ import torchvision.transforms as transforms
 
 import constants as C
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 def evaluate_model(model, data, batch_size = 50, device=None, classification = False, outputs = None):
 	model.eval()
 	n_minibatches = math.ceil(len(data[0]) / batch_size)
