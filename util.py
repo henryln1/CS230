@@ -55,7 +55,7 @@ def evaluate_model(model, data, batch_size = 50, device=None, classification = F
 	f.close()
 	return total_loss, accuracy
 
-def test_model(model, output_path, test_data, batch_size = 50, device=None, classification = False):
+def test_model(model, output_path, test_data, batch_size = 50, device=None, classification = False, outputs = None):
 	print(80 * "=")
 	print("Testing")
 	print(80 * "=")
@@ -64,7 +64,7 @@ def test_model(model, output_path, test_data, batch_size = 50, device=None, clas
 	model.load_state_dict(model_dict)
 	print("Final evaluation on test set")
 	print("Evaluating model on test data...")
-	loss, accuracy = evaluate_model(model, test_data, batch_size, device)
+	loss, accuracy = evaluate_model(model, test_data, batch_size, device, outputs = outputs)
 
 	return loss, accuracy
 
