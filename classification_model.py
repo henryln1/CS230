@@ -110,7 +110,7 @@ for epoch in range(num_epochs):
 		loss = loss_fn(logits, train_y.to(device))
 		loss.backward()
 		optimizer.step()
-		print("Labels:",, train_y)
+		print("Labels:", train_y)
 		# print("Logits: {}".format(logits))
 		total_loss += loss.item()
 		# idxs = logits
