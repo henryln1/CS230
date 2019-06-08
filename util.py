@@ -110,13 +110,17 @@ def process_as_classification(label):
 	@param label (int): Reddit score
 	@return: classification label
 	"""
+	print("Label: ")
 	upper_bounds = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 	upper_bounds = [0, 1, 5, 10, 20, 30, 40, 50, 60, 70, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 	for idx in range(1, len(upper_bounds)):
 		if label in range(upper_bounds[idx - 1], upper_bounds[idx]):
+			print("IDX: ", idx - 1)
 			return idx - 1
 	if label >= 1000:
+		print("IDX: ", len(upper_bounds) - 1)
 		return len(upper_bounds) - 1
+
 
 def read_corpus(file_path, word_vectors = None, device = None, classification = False):
 	""" Read file, where each sentence is dilineated by a `\n`.
