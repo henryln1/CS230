@@ -20,13 +20,13 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # Hyper-parameters
 # sequence_length = 100
 input_size = 50
-hidden_size = 1024
+hidden_size = 2048
 num_layers = 2
 num_epochs = 3
 num_classes = 20
 learning_rate = 0.001
 
-BATCH_SIZE = 256
+BATCH_SIZE = 64
 
 class ClassBiRNN(nn.Module):
 	def __init__(self, glove_vec, input_size, hidden_size, num_layers, num_classes):
