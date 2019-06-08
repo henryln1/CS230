@@ -44,13 +44,13 @@ def evaluate_model(model, data, batch_size, device, classification = False, outp
 		logits = model.forward(x.to(device))
 
 		if classification:
-			total_loss += nn.CrossEntropyLoss()(logits, y.to(device)).item()
+			loss_fn = nn.CrossEntropyLoss()
+			total_loss += loss_fn(logits, y.type('torch.FloatTensor').to(device)).item()
+			# total_loss += nn.CrossEntropyLoss()(logits, y.to(device)).item()
 			idxs = torch.argmax(logits, dim=1)
 			num_correct += torch.sum(idxs == y.to(device)).item()
 		else:
-			loss_fn = nn.CrossEntropyLoss()
-			total_loss = loss_fn(logits, y.type('torch.FloatTensor').to(device)).item()
-			# total_loss += nn.SmoothL1Loss()(logits, y.type('torch.FloatTensor').to(device)).item()
+			total_loss += nn.SmoothL1Loss()(logits, y.type('torch.FloatTensor').to(device)).item()
 			idxs = logits
 			num_correct += torch.sum(idxs == torch.round(y.type('torch.FloatTensor')).to(device)).item()
 
