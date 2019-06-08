@@ -12,6 +12,12 @@ import os
 import re
 import math
 
+
+import torch 
+import torch.nn as nn
+import torchvision
+import torchvision.transforms as transforms
+
 import constants as C
 
 def evaluate_model(model, data, batch_size = 50, device=None, classification = False, outputs = None):
