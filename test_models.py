@@ -81,6 +81,12 @@ class_model = ClassBiRNN(glove, input_size, hidden_size, num_layers, c_num_class
 # U.test_model(model, output_path, test_data, BATCH_SIZE, outputs = 'regression_results.txt')
 
 # Test classification model
+
 output_path = C.filenames['class_rnn']
-print("Testing classification model...")
-U.test_model(class_model, output_path, test_data, BATCH_SIZE, device, classification = True, outputs = 'classification_results_new_split.txt')
+print("Testing classification model on dev data")
+U.test_model(class_model, output_path, dev_data, BATCH_SIZE, device, classification = True, outputs = 'classification_results_new_split_dev.txt')
+
+
+output_path = C.filenames['class_rnn']
+print("Testing classification model... on test data")
+U.test_model(class_model, output_path, test_data, BATCH_SIZE, device, classification = True, outputs = 'classification_results_new_split_test.txt')
