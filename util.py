@@ -85,7 +85,7 @@ def plot_all_losses(train_losses):
 	plt.xlabel('Iterations')
 	plt.ylabel('Loss')
 	plt.title('Loss Curve')
-	plt.savefig('graph_batch_loss_06_07_19_classification_v2_low_lr.png')
+	plt.savefig('graph_batch_loss_06_07_19_classification_v2_low_lr_new_split.png')
 	plt.close()
 
 def plot_losses(train_losses, dev_losses):
@@ -94,13 +94,13 @@ def plot_losses(train_losses, dev_losses):
 	plt.ylabel('Loss')
 	plt.title('Training Loss')
 	# plt.legend(('Train Loss', 'Dev Loss'))
-	plt.savefig("graph_train_loss_06_07_19_classification_v2_low_lr.png")
+	plt.savefig("graph_train_loss_06_07_19_classification_v2_low_lr_new_split.png")
 	plt.close()
 	plt.plot(range(len(dev_losses)), dev_losses)
 	plt.xlabel('Epoch')
 	plt.ylabel('Loss')
 	plt.title('Dev Loss')
-	plt.savefig("graph_dev_loss_06_07_19_classification_v2_low_lr.png")
+	plt.savefig("graph_dev_loss_06_07_19_classification_v2_low_lr_new_split.png")
 	plt.close()
 	print('Saved graph!')
 
@@ -111,6 +111,7 @@ def process_as_classification(label):
 	@return: classification label
 	"""
 	upper_bounds = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+	upper_bounds = [0, 1, 5, 10, 20, 30, 40, 50, 60, 70, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 	for idx in range(1, len(upper_bounds)):
 		if label in range(upper_bounds[idx - 1], upper_bounds[idx]):
 			return idx - 1
