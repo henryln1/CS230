@@ -39,10 +39,11 @@ def evaluate_model(model, data, batch_size, device, classification = False, outp
 	print("Device:", device)
 	for batch in batches:
 		x, y = batch
+		print("Y:" , y)
 		if(x.size(1) == 0):
 			continue
 		logits = model.forward(x.to(device))
-
+		print("Logits: ", logits.item())
 		if classification:
 			loss_fn = nn.CrossEntropyLoss()
 			total_loss += loss_fn(logits, y.to(device)).item()
