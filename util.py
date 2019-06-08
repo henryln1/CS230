@@ -60,8 +60,8 @@ def evaluate_model(model, data, batch_size, device, classification = False, outp
 	print("Test Loss: {}".format(total_loss))
 	print("Accuracy: {}".format(accuracy))
 	with open(outputs, 'w') as f:
-		f.write('Predicted: ', predicted)
-		f.write('Actual: ', actual)
+		f.write('Predicted: ' + str(predicted))
+		f.write('Actual: ' + str(actual))
 	f.close()
 	return total_loss, accuracy
 
