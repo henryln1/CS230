@@ -116,7 +116,7 @@ for epoch in range(num_epochs):
 		# idxs = logits
 		idxs = torch.argmax(logits, dim=1)
 		num_correct += torch.sum(idxs == train_y.to(device)).item()
-		print("Loss: {}".format(loss) )
+		# print("Loss: {}".format(loss) )
 		individual_training_batch_losses.append(loss.item())
 	train_acc = num_correct / len(train_data[0])
 		# num_updates += 1
