@@ -3,7 +3,7 @@ import sys
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import numpy as np 
-
+import csv
 
 
 def extract_results(file_name):
@@ -93,12 +93,26 @@ def build_confusion_matrix(predicted, actual):
 	plt.close()
 
 
+def precentage_one(file_name):
+	counter = 0
+	total_lines = 0
+	with open(file_name, newline='') as f:
+		reader = csv.reader(f, delimiter = ',')
+		for line in reader:
+			print(line)
+			total_lines += 1
+			if total_lines == 1:
+				continue
+			# print("line:", line)
+			if line[3] == '1':
+				counter += 1
+	print(counter/total_lines)
 
 def main():
 	if len(sys.argv) > 1:
 		file_name = sys.argv[1]
 	else:
-		file_name = 'classification_results_new_split.txt'
+		file_name = 'classification_results_new_split_dev.txt'
 
 	predicted, actual = extract_results(file_name)
 	print("Results extracted")
@@ -108,7 +122,7 @@ def main():
 	print('Precision: ', precision)
 	print('Recall: ', recall)
 	print('F1: ', f1)
-
+	precentage_one('test_file_8k_max_score_capped=1000.csv')
 
 
 
