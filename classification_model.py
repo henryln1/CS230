@@ -22,9 +22,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 input_size = 50
 hidden_size = 1024
 num_layers = 2
-num_epochs = 10
+num_epochs = 3
 num_classes = 20
-learning_rate = 0.0003
+learning_rate = 0.001
 
 BATCH_SIZE = 256
 
@@ -111,7 +111,7 @@ for epoch in range(num_epochs):
 		loss.backward()
 		optimizer.step()
 		print("Labels:", train_y)
-		# print("Logits: {}".format(logits))
+		print("Logits: {}".format(logits))
 		total_loss += loss.item()
 		# idxs = logits
 		idxs = torch.argmax(logits, dim=1)
@@ -151,8 +151,8 @@ for epoch in range(num_epochs):
 		logits = model.forward(dev_x.to(device))
 		total_dev_loss += loss_fn(logits, dev_y.to(device)).item()
 		idxs = torch.argmax(logits, dim=1)
-		# print("Dev Predictions: {}".format(idxs))
-		# print("Dev Actual: {}".format(dev_y))
+		print("Dev Predictions: {}".format(idxs))
+		print("Dev Actual: {}".format(dev_y))
 		# idxs = logits
 		num_correct += torch.sum(idxs == dev_y.to(device)).item()
 
