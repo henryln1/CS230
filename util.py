@@ -20,9 +20,8 @@ import torchvision.transforms as transforms
 
 import constants as C
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def evaluate_model(model, data, batch_size = 50, classification = False, outputs = None):
+def evaluate_model(model, data, batch_size = 50, device=None, classification = False, outputs = None):
 	model.eval()
 	n_minibatches = math.ceil(len(data[0]) / batch_size)
 	batches = []
@@ -64,7 +63,7 @@ def evaluate_model(model, data, batch_size = 50, classification = False, outputs
 	f.close()
 	return total_loss, accuracy
 
-def test_model(model, output_path, test_data, batch_size = 50, classification = False, outputs = None):
+def test_model(model, output_path, test_data, batch_size = 50, device=None, classification = False, outputs = None):
 	print(80 * "=")
 	print("Testing")
 	print(80 * "=")
@@ -73,7 +72,7 @@ def test_model(model, output_path, test_data, batch_size = 50, classification = 
 	model.load_state_dict(model_dict)
 	print("Final evaluation on test set")
 	print("Evaluating model on test data...")
-	loss, accuracy = evaluate_model(model, test_data, batch_size, classification = True, outputs = outputs)
+	loss, accuracy = evaluate_model(model, test_data, batch_size, device, classification = True, outputs = outputs)
 
 	return loss, accuracy
 
