@@ -45,7 +45,7 @@ def evaluate_model(model, data, batch_size, device, classification = False, outp
 
 		if classification:
 			loss_fn = nn.CrossEntropyLoss()
-			total_loss += loss_fn(logits, y.type('torch.LongTensor').to(device)).item()
+			total_loss += loss_fn(logits, y.to(device)).item()
 			# total_loss += nn.CrossEntropyLoss()(logits, y.to(device)).item()
 			idxs = torch.argmax(logits, dim=1)
 			num_correct += torch.sum(idxs == y.to(device)).item()
