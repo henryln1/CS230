@@ -118,9 +118,10 @@ for epoch in range(num_epochs):
 		num_correct += torch.sum(idxs == train_y.to(device)).item()
 		# print("Loss: {}".format(loss) )
 		individual_training_batch_losses.append(loss.item())
+		print("Epoch:", epoch, "Iteration:", num_updates, "Loss:", loss.item())
+
 	train_acc = num_correct / len(train_data[0])
 		# num_updates += 1
-		print("Epoch:", epoch, "Iteration:", num_updates, "Loss:", loss.item()
 
 		# loss_meter.update(loss.item())
 	train_losses.append(total_loss)
