@@ -6,8 +6,10 @@ random.seed(1)
 full_data_file = 'train_data.csv'
 full_dev_data_file = 'dev_data.csv'
 full_test_data_file = 'test_data.csv'
-balanced_data_file = 'train_data_data_augmentation_and_max_score_capped=1000_60k_examples.csv'
+balanced_data_file = 'train_data_data_augmentation_and_max_score_capped=1000_60k_examples_ones_limited.csv'
 
+
+number_of_ones = 10000
 
 dev_file = 'dev_data_8k_max_score_capped=1000.csv'
 test_file = 'test_file_8k_max_score_capped=1000.csv'
@@ -80,6 +82,7 @@ large_scores_list = []
 
 
 with open(full_data_file, newline = '') as f:
+	number_ones = 0
 	reader = csv.reader(f, delimiter = ',')
 	counter = 0
 	for line in reader:
@@ -93,7 +96,11 @@ with open(full_data_file, newline = '') as f:
 			line[3] = str(threshold)
 			large_scores_list.append(line)
 		else:
-			small_scores_list.append(line)
+			if line[3] != str(1):
+				small_scores_list.append(line)
+			if line[3] == str(1) and number_ones < number_of_ones:
+				small_scores_list.append(line)
+				number_ones += 1
 
 print("Shuffling")
 random.shuffle(small_scores_list)
