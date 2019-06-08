@@ -24,7 +24,7 @@ hidden_size = 2048
 num_layers = 2
 num_epochs = 3
 num_classes = 20
-learning_rate = 0.001
+learning_rate = 0.1
 
 BATCH_SIZE = 64
 
