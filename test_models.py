@@ -27,7 +27,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # Hyper-parameters
 # sequence_length = 100
 input_size = 50
-hidden_size = 1024
+hidden_size = 2048
 num_layers = 2
 num_epochs = 10
 num_classes = 20
